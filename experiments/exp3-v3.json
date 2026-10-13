@@ -1,0 +1,86 @@
+{
+  "name": "exp3-v3",
+  "format": "v3",
+  "k": 15,
+  "model": "qwen3.5:2b",
+  "temperature": 0,
+  "runAt": "2026-10-13T08:34:31.884Z",
+  "results": [
+    {
+      "type": "직접",
+      "question": "계약부채가 뭐야?",
+      "expect": "IFRS-014 인용",
+      "top1": "IFRS-014 0.772",
+      "cited": false,
+      "citedIds": [],
+      "unknownIds": [],
+      "literalIdPlaceholder": false,
+      "copiedHeader": false,
+      "chars": 89,
+      "seconds": 158.4,
+      "answer": "고객에게서 이미 대가를 받았거나 대가의 지급기일이 되었는데, 그에 대응해 재화나 용역을 고객에게 이전해야 하는 기업의 의무를 말합니다. (부록 A 용어의 정의)"
+    },
+    {
+      "type": "직접",
+      "question": "변동대가는 어떻게 추정해?",
+      "expect": "IFRS-008 인용",
+      "top1": "IFRS-008 0.736",
+      "cited": false,
+      "citedIds": [],
+      "unknownIds": [],
+      "literalIdPlaceholder": false,
+      "copiedHeader": false,
+      "chars": 154,
+      "seconds": 149.9,
+      "answer": "기댓값은 가능한 대가 금액마다 확률을 곱해 더한 값으로, 특성이 비슷한 계약이 많을 때 적절할 수 있다. 가능성이 가장 높은 금액은 가능한 결과 중 가장 가능성이 높은 단일 금액으로, 성과보너스를 받거나 못 받는 경우처럼 결과가 두 가지뿐일 때 적절할 수 있다. (문단 53)"
+    },
+    {
+      "type": "여러 청크 연결",
+      "question": "수익인식 5단계가 뭐야?",
+      "expect": "1~5단계 청크 인용",
+      "top1": "IFRS-011 0.753",
+      "cited": true,
+      "citedIds": [
+        "IFRS-011"
+      ],
+      "unknownIds": [],
+      "literalIdPlaceholder": false,
+      "copiedHeader": false,
+      "chars": 71,
+      "seconds": 160.1,
+      "answer": "[IFRS-011] 수익인식 5단계에서는 고객에게 약속한 재화나 용역, 즉 자산을 이전해 수행의무를 이행할 때 수익을 인식한다."
+    },
+    {
+      "type": "여러 청크 연결",
+      "question": "수행의무를 식별한 다음 거래가격은 어떻게 배분해?",
+      "expect": "IFRS-004·009 인용",
+      "top1": "IFRS-009 0.779",
+      "cited": true,
+      "citedIds": [
+        "IFRS-009"
+      ],
+      "unknownIds": [],
+      "literalIdPlaceholder": false,
+      "copiedHeader": false,
+      "chars": 260,
+      "seconds": 150.9,
+      "answer": "거래가격을 배분하는 목적과 기준에 대한 내용은 [IFRS-009] (수익인식 5단계 - 4단계 거래가격 배분의 목적과 기준) 에 명시되어 있습니다. 해당 규정은 수익인식 4 단계에서 수행의무에 대해 기업이 받을 권리를 갖게 될 금액을 나타내기 위해 거래가격을 나누는 것을 목적으로 하며, 원칙적으로 상대적 개별 판매가격을 기준으로 각 수행의무에 배분해야 한다고 규정하고 있습니다. 다만, 할인액의 배분과 변동대의 배분은 별도의 규정을 따릅니다.\n\n[IFRS-009]"
+    },
+    {
+      "type": "사내 절차",
+      "question": "판단이 안 서는 계약은 누구한테 물어봐?",
+      "expect": "IFRS-016 인용",
+      "top1": "IFRS-016 0.720",
+      "cited": true,
+      "citedIds": [
+        "IFRS-016"
+      ],
+      "unknownIds": [],
+      "literalIdPlaceholder": false,
+      "copiedHeader": false,
+      "chars": 138,
+      "seconds": 154.1,
+      "answer": "[IFRS-016] 신입 담당자는 검토 중 판단이 서지 않는 항목이 있으면 혼자 결론을 내리지 않고 검토 양식에 '판단 보류'로 표시한다. 판단 보류 항목은 먼저 회계팀 선임에게 검토를 요청하고, 선임 검토로도 결론이 나지 않으면 팀장에게 올린다."
+    }
+  ]
+}

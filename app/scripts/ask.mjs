@@ -2,7 +2,7 @@
 // 검색: search.mjs(search-core.ts), 프롬프트: src/prompt.ts, LLM·판정: src/ollama.ts
 //
 // 사용법 (app 폴더에서):
-//   node scripts/ask.mjs "질문" [--show-prompt] [--k 15] [--format v1|v2] [--judge]
+//   node scripts/ask.mjs "질문" [--show-prompt] [--k 15] [--format v1|v2|v3] [--judge]
 //   --show-prompt  LLM에 보내는 system/user 메시지를 출력하고 끝낸다 (Ollama 없이 동작)
 //   --k            모델에 넘길 근거 수 (기본 15 = 앱과 같음)
 //   --format       프롬프트 형식 (기본 = src/prompt.ts의 PROMPT_FORMAT)
@@ -10,7 +10,7 @@
 
 import { pathToFileURL } from "node:url";
 import { search, WEAK_THRESHOLD } from "./search.mjs";
-import { buildPrompt, systemMessage, citedIds, PROMPT_FORMAT } from "../src/prompt.ts";
+import { buildPrompt, systemMessage, citedIds, PROMPT_FORMAT, PROMPT_FORMATS } from "../src/prompt.ts";
 import { chatStream, pingOllama, judgeWithOllama } from "../src/ollama.ts";
 
 const MODEL = "qwen3.5:2b";
@@ -59,8 +59,8 @@ async function main(argv) {
     else if (argv[i] === "--format") format = argv[++i];
     else question = argv[i];
   }
-  if (!question || !(k > 0) || !["v1", "v2"].includes(format)) {
-    console.error('사용법: node scripts/ask.mjs "질문" [--show-prompt] [--k 15] [--format v1|v2] [--judge]');
+  if (!question || !(k > 0) || !PROMPT_FORMATS.includes(format)) {
+    console.error('사용법: node scripts/ask.mjs "질문" [--show-prompt] [--k 15] [--format v1|v2|v3] [--judge]');
     process.exit(1);
   }
 

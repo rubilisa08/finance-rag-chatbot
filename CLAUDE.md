@@ -32,10 +32,19 @@
 - `search.mjs`는 직접 실행될 때만 CLI를 돈다(`process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href`). 다른 파일은 `search(question, k)`와 `WEAK_THRESHOLD`를 import해 재사용한다.
 - 메타 파일이 현재 임베딩 계약과 다르면 `search.mjs`도 검색을 거부한다.
 
+## 생성 계약
+- 시스템 메시지와 프롬프트 조립은 `app/src/prompt.ts` **한 곳에만** 둔다. 앱(`App.tsx`)과 터미널(`app/scripts/ask.mjs`, `run-questions.mjs`)이 같은 코드를 쓴다. 시스템 메시지의 내용(역할, 범위 밖 규칙, 사례 판단 처리)은 제품 결정이라 PRD 5장과 맞춰 레포 소유자가 정한다.
+- 프롬프트 형식은 `PROMPT_FORMAT`(현재 `"v3"`)으로 관리하고, v1·v2는 비교 재현용으로 남긴다. 형식을 바꾸면 README 실험으로 전후를 비교한다.
+- 사용자 메시지 순서: ① 자료 소개 ② 근거 원칙(1위 점수 < `WEAK_THRESHOLD`면 "주의: …" 문구) ③ 출처 규칙 ④ KST 현재 시각 ⑤ `[자료]` + `[IFRS-xxx] (section) text` 줄들(대괄호 안에는 ID만) ⑥ `[질문]` ⑦ 출처 규칙 한 번 더.
+- v3 출처 규칙: "근거가 된 조각의 ID만 [{검색 1위 ID}]처럼 대괄호로 감싸 해당 문장 끝에 표시합니다." 고정 예시 ID를 쓰면 모델이 그 ID를 그대로 베껴 넘기지 않은 청크를 인용한다(실험 3).
+- LLM: Ollama `http://localhost:11434/api/chat`, `qwen3.5:2b`, `{ stream: true, think: false, options: { temperature: 0 } }`, NDJSON, `TextDecoder({ stream: true })` (`app/src/ollama.ts`).
+- 근거 표시는 LLM에 맡기지 않는다. 넘긴 근거를 모두 보여 주고, 답변에 ID가 실제로 적힌 근거에 ✓를 붙인다(`citedIds()`).
+- Ollama 연결은 실제로 호출할 때만 확인한다. `ask.mjs --show-prompt`는 Ollama 없이 동작한다.
+
 ## 데이터 규칙
 - 청크 원본은 `data/chunks.json`. 벡터스토어는 여기서 만든다 (직접 고치지 않는다).
 - 청크 하나에 중심 사실 하나, `text` 120자 이상, `id`는 `IFRS-001`부터 연속.
-- 기준서 청크(`IFRS-001`~`014`): `text`는 기준서 문장을 옮기지 않고 **직접 요약**한다. 원문에 없는 해석·예시·수치를 넣지 않는다. `text` 끝과 `section`에 문단 번호를 적고, `url`은 한국회계기준원 회계기준열람서비스(`https://db.kasb.or.kr/s/1115/...`)의 해당 목차 페이지다.
+- 기준서 청크(`IFRS-001`~`014`, `IFRS-019`~`030`): `text`는 기준서 문장을 옮기지 않고 **직접 요약**한다. 원문에 없는 해석·예시·수치를 넣지 않는다. `text` 끝과 `section`에 문단 번호를 적고, `url`은 한국회계기준원 회계기준열람서비스(`https://db.kasb.or.kr/s/1115/...`)의 해당 목차 페이지다.
 - 공개 레포라서 기준서 원문 발췌본은 레포에 넣지 않는다 (저작권은 IFRS 재단).
 - 사내 가이드 청크(`IFRS-015`~`018`): `docs/revenue-guide.md`의 `##` 절 하나가 청크 하나다. `section`은 `교육용 사내 가이드 - 제목`, `url`은 `https://github.com/rubilisa08/finance-rag-chatbot/blob/main/docs/revenue-guide.md#제목`(공백은 하이픈). 사내 절차만 쓰고 회계기준 내용은 쓰지 않는다.
 

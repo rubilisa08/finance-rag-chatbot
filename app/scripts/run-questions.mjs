@@ -9,7 +9,7 @@ import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { answer, checkOllama } from "./ask.mjs";
 import { judgeWithOllama } from "../src/ollama.ts";
-import { PROMPT_FORMAT } from "../src/prompt.ts";
+import { PROMPT_FORMAT, PROMPT_FORMATS } from "../src/prompt.ts";
 
 const OUT_DIR = fileURLToPath(new URL("../../experiments/", import.meta.url));
 const DEFAULT_QUESTIONS = fileURLToPath(new URL("../../data/fixed-questions.json", import.meta.url));
@@ -37,8 +37,8 @@ async function main(argv) {
     else if (argv[i] === "--judge") judge = true;
     else if (argv[i] === "--k") k = Number(argv[++i]);
   }
-  if (!name || !["v1", "v2"].includes(format)) {
-    console.error("사용법: node scripts/run-questions.mjs --name <실험이름> --format v1|v2 [--questions 파일] [--judge] [--k 15]");
+  if (!name || !PROMPT_FORMATS.includes(format)) {
+    console.error("사용법: node scripts/run-questions.mjs --name <실험이름> --format v1|v2|v3 [--questions 파일] [--judge] [--k 15]");
     process.exit(1);
   }
   if (!(await checkOllama())) process.exit(1);
