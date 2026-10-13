@@ -1,0 +1,8 @@
+{
+  "model": "onnx-community/embeddinggemma-300m-ONNX",
+  "modelFile": "model_no_gather_q4",
+  "dim": 768,
+  "inputFormat": "embeddinggemma-official-v1",
+  "count": 18,
+  "createdAt": "2026-10-13T07:35:24.917Z"
+}
