@@ -12,7 +12,7 @@ import { MODEL_ID, MODEL_FILE, queryInput, metaMismatch, type StoreMeta } from "
 import { rankHybrid, type DocChunk, type Retrieved } from "./search-core";
 
 export { WEAK_THRESHOLD, type DocChunk, type Retrieved } from "./search-core";
-export { buildPrompt, SYSTEM_MESSAGE, citedIds } from "./prompt";
+export { buildPrompt, SYSTEM_MESSAGE, citedIds, refusalSignals, disclaimer } from "./prompt";
 
 const HF_ONNX = `https://huggingface.co/${MODEL_ID}/resolve/main/onnx`;
 // transformers.js 4.2.0이 쓰는 것과 같은 onnxruntime-web 빌드 (검증된 조합)

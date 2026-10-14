@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, type CSSProperties } from "react";
 import {
-  retrieve, buildPrompt, SYSTEM_MESSAGE, citedIds, loadCorpus, onEmbedProgress, peekModelCache, WEAK_THRESHOLD,
+  retrieve, buildPrompt, SYSTEM_MESSAGE, citedIds, refusalSignals, disclaimer, loadCorpus, onEmbedProgress, peekModelCache, WEAK_THRESHOLD,
   type Retrieved,
 } from "./rag";
 import { chatStream, pingOllama, judgeWithOllama, type ChatMsg } from "./ollama";
@@ -21,6 +21,31 @@ interface Turn {
 
 type Phase = "idle" | "embed" | "search" | "stream" | "error-ollama";
 
+/** 답변 바로 아래 근거 문단 — 답변이 인용한 문단을 펼쳐 보여 준다 (근거 문단 먼저: PRD 2장).
+ *  답변에 ID가 없으면 검색 상위 3개를 "관련될 수 있는 문단"으로, 거절 답변이면 아무것도 보이지 않는다. */
+function CitedParagraphs({ answer, sources }: { answer: string; sources: Retrieved[] }) {
+  const cited = citedIds(answer, sources);
+  const list = cited.size ? sources.filter((s) => cited.has(s.chunk.id)) : sources.slice(0, 3);
+  if (!cited.size && (refusalSignals(answer).refused || sources[0].score < WEAK_THRESHOLD)) return null;
+  return (
+    <div className="cited">
+      <div className="cited-title">
+        {cited.size ? "📚 근거 문단 — 원문으로 확인하세요" : "📚 관련될 수 있는 문단 — 답변에 근거 표시가 없어 검색 상위 문단을 보여 드립니다"}
+      </div>
+      {list.map((s) => (
+        <div key={s.chunk.id} className="cited-row">
+          <span className="cited-id">{s.chunk.id}</span>
+          <span className="cited-sec">{s.chunk.section}</span>
+          <a href={s.chunk.url} target="_blank" rel="noreferrer">
+            {s.chunk.url.includes("kasb.or.kr") ? "기준서 원문 →" : "사내 가이드 →"}
+          </a>
+        </div>
+      ))}
+      <p className="cited-note">{disclaimer(list)}</p>
+    </div>
+  );
+}
+
 // 파이프라인 단계 — 튜토리얼용 표시
 const PHASE_LABEL: Record<Phase, string> = {
   idle: "",
@@ -35,7 +60,7 @@ export default function App() {
     {
       role: "assistant",
       content:
-        "안녕하세요. K-IFRS 제1115호(고객과의 계약에서 생기는 수익) 안내 챗봇입니다. 수익인식 5단계와 관련 기준을 물어보세요. 답은 기준서를 요약한 근거로만 드리고, 출처 칩에서 기준서 원문을 열어 확인할 수 있습니다.",
+        "안녕하세요. K-IFRS 제1115호(고객과의 계약에서 생기는 수익) 학습 도우미입니다. 공부하다 궁금한 개념을 물어보세요. 짧게 요약하고, 근거가 된 기준서 문단을 바로 아래에 원문 링크와 함께 보여 드립니다. 실제 계약의 회계처리 판단은 하지 않습니다.",
     },
   ]);
   const [input, setInput] = useState("");
@@ -188,14 +213,14 @@ export default function App() {
     <div className="app">
       <header className="hero">
         <div className="hero-inner">
-          <p className="hero-badge">회계팀 신입 · 회계 학습자를 위한 기준서 안내</p>
+          <p className="hero-badge">회계 학습자를 위한 기준서 학습 · 문단 찾기 도우미</p>
           <h1>K-IFRS 1115 <span className="accent">수익인식</span></h1>
           <p className="hero-sub">
-            고객과의 계약에서 생기는 수익을 언제, 얼마로 인식할까요? 계약 식별부터 수행의무 이행까지
-            수익인식 5단계를 아래 챗봇에게 물어보세요 — 로컬 모델이 기준서 요약에서 근거를 찾아 답하고,
-            출처에서 기준서 원문을 바로 열 수 있습니다.
+            수백 문단짜리 기준서에서 "계약부채가 뭐지?", "본인과 대리인은 어떻게 구분하지?"의 답이 있는
+            문단을 찾기 어려우셨나요? 질문하면 짧게 요약하고, 근거가 된 기준서 문단을 원문 링크와 함께
+            바로 보여 드립니다. 공부를 돕는 도구이며, 실제 계약의 회계처리를 판단하지는 않습니다.
           </p>
-          <a className="hero-cta" href="#chat">챗봇으로 물어보기 ↓</a>
+          <a className="hero-cta" href="#chat">질문하고 문단 찾기 ↓</a>
         </div>
       </header>
 
@@ -250,20 +275,21 @@ export default function App() {
 
       <section className="info">
         <div className="card card-a">
-          <h2>다루는 범위</h2>
+          <h2>공부할 수 있는 범위</h2>
           <p>
             K-IFRS 제1115호의 핵심 원칙, 수익인식 5단계(계약 식별 → 수행의무 식별 → 거래가격 산정 →
             배분 → 수행의무 이행)와 계약변경·진행률·변동대가·금융요소·계약원가·반품권·보증·본인 대
-            대리인, 계약자산·계약부채 용어를 안내합니다. 다른 기준서, 세무, 주가는 다루지 않으며, 개별
-            계약의 회계처리 결론은 내리지 않습니다.
+            대리인, 계약자산·계약부채 용어. 다른 기준서, 세무, 주가는 다루지 않고, 개별 계약의 회계처리는
+            판단하지 않습니다.
           </p>
         </div>
         <div className="card card-b">
-          <h2>근거 원칙</h2>
+          <h2>근거 문단 먼저</h2>
           <p>
-            모든 답변은 한국회계기준원 회계기준열람서비스의 기준서를 요약한 조각과 교육용 사내
-            가이드(검토 절차·문의 순서·증빙)에 근거합니다. 자료에 없으면 없다고 답합니다. 출처 칩을
-            누르면 근거 조각과 원문 링크(기준서는 문단 번호 포함)를 볼 수 있습니다.
+            답변 바로 아래에 근거가 된 기준서 문단(문단 번호·원문 링크)이 펼쳐져 나옵니다. 요약보다
+            원문이 정확하니, 링크를 열어 원문으로 공부하세요. 자료는 한국회계기준원 회계기준열람서비스의
+            기준서를 직접 요약한 것과 교육용 사내 가이드이며, 자료에 없으면 없다고 답합니다. 기준서 원문은
+            저작권(IFRS 재단)이 있어 옮기지 않고 요약했습니다.
           </p>
         </div>
         <div className="card card-c">
@@ -277,7 +303,7 @@ export default function App() {
 
       <section id="chat" className="chat">
         <h2>
-          K-IFRS 1115 안내 챗봇
+          K-IFRS 1115 학습 도우미
           <span className={`conn ${ollamaOk === true ? "ok" : ollamaOk === false ? "bad" : ""}`}>
             {engine === "gemini"
               ? "Gemini API"
@@ -312,6 +338,9 @@ export default function App() {
                     <button aria-label="싫어요" className={t.feedback === "down" ? "on" : ""} onClick={() => setFeedback(i, "down")}>👎</button>
                   </span>
                 </div>
+              )}
+              {t.sources && t.content && !(phase === "stream" && i === turns.length - 1) && (
+                <CitedParagraphs answer={t.content} sources={t.sources} />
               )}
               {t.sources && !(phase === "stream" && i === turns.length - 1) && (
                 <div className="chips">
@@ -390,7 +419,7 @@ export default function App() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && ask()}
-            placeholder="예: 수익인식 5단계가 뭐야?"
+            placeholder="예: 계약부채가 뭐야? / 본인과 대리인은 어떻게 구분해?"
             disabled={phase !== "idle"}
           />
           {phase === "stream" ? (
@@ -425,7 +454,7 @@ export default function App() {
 
       <footer className="footer">
         <p>
-          K-IFRS 1115 안내 챗봇 — 교육용 데모이며 회계 자문을 대신하지 않습니다.
+          K-IFRS 1115 학습 도우미 — 공부를 돕는 교육용 데모이며, 회계 자문이나 실제 회계처리 판단을 대신하지 않습니다.
           모델: qwen3.5:2b (ollama) · 임베딩: embeddinggemma-300m (브라우저).
         </p>
         <p>

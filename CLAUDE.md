@@ -34,7 +34,8 @@
 
 ## 생성 계약
 - 시스템 메시지와 프롬프트 조립은 `app/src/prompt.ts` **한 곳에만** 둔다. 앱(`App.tsx`)과 터미널(`app/scripts/ask.mjs`, `run-questions.mjs`)이 같은 코드를 쓴다. 시스템 메시지의 내용(역할, 범위 밖 규칙, 사례 판단 처리)은 제품 결정이라 PRD 5장과 맞춰 레포 소유자가 정한다.
-- 프롬프트 형식은 `PROMPT_FORMAT`(현재 `"v3"`)으로 관리하고, v1·v2는 비교 재현용으로 남긴다. 형식을 바꾸면 README 실험으로 전후를 비교한다.
+- 프롬프트 형식은 `PROMPT_FORMAT`(현재 `"v3"`)으로 관리하고, v1·v2·v4는 비교 재현용으로 남긴다. 형식을 바꾸면 README 실험으로 전후를 비교한다. (v4 = 학습 도우미 시스템 메시지, 실험 5에서 기각)
+- 제품 정의(PRD v2.0 "학습·문단 찾기 도우미")는 모델 지시보다 **프로그램이 확실하게 하는 부분**으로 구현한다: 답변 아래 `CitedParagraphs`(인용 문단을 펼친 상태로, 인용이 없으면 검색 상위 3개, 거절·약한 근거면 숨김), `disclaimer()`(인용 청크의 section에서 문단 번호를 뽑아 면책 문구 생성), 거절 판정 `refusalSignals()`(화면과 실험 측정이 같은 기준). 모두 `app/src/prompt.ts`.
 - 사용자 메시지 순서: ① 자료 소개 ② 근거 원칙(1위 점수 < `WEAK_THRESHOLD`면 "주의: …" 문구) ③ 출처 규칙 ④ KST 현재 시각 ⑤ `[자료]` + `[IFRS-xxx] (section) text` 줄들(대괄호 안에는 ID만) ⑥ `[질문]` ⑦ 출처 규칙 한 번 더.
 - v3 출처 규칙: "근거가 된 조각의 ID만 [{검색 1위 ID}]처럼 대괄호로 감싸 해당 문장 끝에 표시합니다." 고정 예시 ID를 쓰면 모델이 그 ID를 그대로 베껴 넘기지 않은 청크를 인용한다(실험 3).
 - LLM: Ollama `http://localhost:11434/api/chat`, `qwen3.5:2b`, `{ stream: true, think: false, options: { temperature: 0 } }`, NDJSON, `TextDecoder({ stream: true })` (`app/src/ollama.ts`).
@@ -64,6 +65,6 @@ npm run search -- "계약부채가 뭐야?" "내일 날씨 어때?"            #
 ## 결정 필요
 - [ ] GitHub Pages 켜기 (Settings → Pages → Source: GitHub Actions) — 레포 소유자가 직접
 - [x] 고정 질문 세트(PRD 9장, 14개) 실험 — README "고정 질문 실험" (`experiments/fixed-v3.json`). 중간에 멈추면 `--resume`으로 이어서 실행
-- [ ] 다음 실험 후보 (한 번에 하나씩): 청크 본문 끝 "(문단 N)" 빼기 / 근거 부족 질문 대응 규칙 / 사례 판단 질문이 IFRS-004·005를 찾도록 연결 문장
+- [ ] 다음 실험 후보 (한 번에 하나씩): 청크 본문 끝 "(문단 N)" 빼기 / 근거 부족 질문 대응 규칙 / 사례 판단 질문이 IFRS-004·005를 찾도록 연결 문장 / 5단계 개요를 시스템 메시지에 고정
 - [ ] (선택) 고정 질문을 `--judge`로 돌려 LLM 판정과 문구 판정 비교 (이 PC에서 2시간 이상)
 - [ ] (선택) 브라우저 모델 캐시 이름 `moducon-embed-v1`(`rag.ts`) — 바꾸면 기존 방문자가 모델을 다시 받으므로 그대로 둠

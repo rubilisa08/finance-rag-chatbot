@@ -10,7 +10,7 @@ import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { answer, checkOllama } from "./ask.mjs";
 import { judgeWithOllama } from "../src/ollama.ts";
-import { PROMPT_FORMAT, PROMPT_FORMATS } from "../src/prompt.ts";
+import { PROMPT_FORMAT, PROMPT_FORMATS, refusalSignals } from "../src/prompt.ts";
 
 const OUT_DIR = fileURLToPath(new URL("../../experiments/", import.meta.url));
 const DEFAULT_QUESTIONS = fileURLToPath(new URL("../../data/fixed-questions.json", import.meta.url));
@@ -25,17 +25,9 @@ function measure(r) {
     unknownIds: [...new Set(allIds.filter((id) => !given.has(id)))], // 넘기지 않은 ID를 지어냈나
     literalIdPlaceholder: r.text.includes("[ID]"),               // "[ID]"라는 글자를 그대로 썼나
     copiedHeader: /\[IFRS-\d{3}\s*\|/.test(r.text),              // "[IFRS-014 | 섹션]" 머리를 베꼈나
-    ...measureRefusal(r.text),
+    ...refusalSignals(r.text),                                   // 거절 여부 (src/prompt.ts — 화면과 같은 기준)
     chars: r.text.length,
   };
-}
-
-/** 답변이 거절·범위 밖 안내를 했는지 — 시스템 메시지에 정한 문구 기준으로 프로그램이 확인 */
-function measureRefusal(text) {
-  const scopeRefusal = /범위 내의 질문에만 답변/.test(text);                   // 도메인 밖 고정 문구
-  const noData = /자료에는 없|자료에 없|자료의 범위 밖|답할 수 없|명시되어 있지 않/.test(text); // 근거 부족·다른 기준서
-  const expertAdvice = /감사인과 확인|회계 담당자나 감사인/.test(text);          // 사례 판단 안내
-  return { refused: scopeRefusal || noData, scopeRefusal, noData, expertAdvice };
 }
 
 async function main(argv) {

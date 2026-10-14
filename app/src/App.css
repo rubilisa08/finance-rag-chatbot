@@ -154,6 +154,8 @@ body {
 }
 
 /* ---------- Marquee — From AI to Infinity ---------- */
+/* 100vw에는 세로 스크롤바 폭이 포함되어 페이지가 가로로 넘친다 — 넘치는 부분은 잘라 낸다 */
+html, body { overflow-x: hidden; }
 .marquee {
   width: 100vw;
   margin-left: calc(50% - 50vw);
@@ -397,6 +399,22 @@ body {
 }
 
 /* Sources chips — 벡터=블루, BM25=핑크 */
+/* 답변 바로 아래 근거 문단 (학습·문단 찾기 도우미: 근거 문단 먼저) */
+.cited {
+  margin-top: .7rem;
+  padding: .6rem .75rem;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--blue);
+  border-radius: 8px;
+  background: var(--surface-2);
+}
+.cited-title { font-size: .78rem; color: var(--dim); margin-bottom: .4rem; }
+.cited-row { display: flex; flex-wrap: wrap; gap: .5rem; align-items: baseline; font-size: .82rem; padding: .15rem 0; }
+.cited-id { font-family: var(--font-mono); font-size: .72rem; color: var(--blue); }
+.cited-sec { color: var(--ink); flex: 1 1 14rem; }
+.cited-row a { color: var(--blue); font-size: .78rem; white-space: nowrap; }
+.cited-note { margin: .5rem 0 0; font-size: .72rem; line-height: 1.5; color: var(--mute); }
+
 .chips { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .65rem; align-items: center; }
 .chips-toggle {
   font-family: var(--font-util);
