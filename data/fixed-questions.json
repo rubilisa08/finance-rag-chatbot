@@ -1,11 +1,16 @@
 [
-  { "type": "직접", "question": "계약부채가 뭐야?", "expect": "IFRS-014 인용" },
-  { "type": "직접", "question": "변동대가는 어떻게 추정해?", "expect": "IFRS-008 인용" },
-  { "type": "여러 청크 연결", "question": "수익인식 5단계가 뭐야?", "expect": "1~5단계 청크 인용" },
-  { "type": "여러 청크 연결", "question": "수행의무를 식별한 다음 거래가격은 어떻게 배분해?", "expect": "IFRS-004·009 인용" },
-  { "type": "근거 부족 (1115호 안)", "question": "라이선스 수익은 언제 인식해?", "expect": "자료에 없다고 답함" },
-  { "type": "1115호 외 기준서", "question": "리스 회계처리는 어떻게 해?", "expect": "범위 밖 안내" },
-  { "type": "사례 판단", "question": "소프트웨어를 팔면서 1년 유지보수를 같이 해 주는데 수행의무가 몇 개야?", "expect": "결론 없이 IFRS-005 기준 + 전문가 확인 권유" },
-  { "type": "사내 절차", "question": "판단이 안 서는 계약은 누구한테 물어봐?", "expect": "IFRS-016 인용" },
-  { "type": "도메인 밖", "question": "내일 삼성전자 주가 오를까요?", "expect": "범위 밖 안내, refusal=true" }
+  { "type": "직접", "question": "계약부채가 뭐야?", "expect": "IFRS-014 인용", "expectRefusal": false },
+  { "type": "직접", "question": "변동대가는 어떻게 추정해?", "expect": "IFRS-008 인용", "expectRefusal": false },
+  { "type": "직접 (확장 자료)", "question": "반품권이 있으면 수익은 어떻게 인식해?", "expect": "IFRS-028 인용", "expectRefusal": false },
+  { "type": "여러 청크 연결", "question": "수익인식 5단계가 뭐야?", "expect": "1~5단계 청크 인용", "expectRefusal": false },
+  { "type": "여러 청크 연결", "question": "수행의무를 식별한 다음 거래가격은 어떻게 배분해?", "expect": "IFRS-004·009 인용", "expectRefusal": false },
+  { "type": "사내 절차", "question": "판단이 안 서는 계약은 누구한테 물어봐?", "expect": "IFRS-016 인용", "expectRefusal": false },
+  { "type": "사례 판단", "question": "소프트웨어를 팔면서 1년 유지보수를 같이 해 주는데 수행의무가 몇 개야?", "expect": "결론 없이 IFRS-005 기준 + 전문가 확인 권유", "expectRefusal": false },
+  { "type": "근거 부족 (1115호 안)", "question": "라이선스 수익은 언제 인식해?", "expect": "자료에 없다고 답함", "expectRefusal": true },
+  { "type": "1115호 외 기준서", "question": "리스 회계처리는 어떻게 해?", "expect": "범위 밖 안내", "expectRefusal": true },
+  { "type": "도메인 밖 (주가)", "question": "내일 삼성전자 주가 오를까요?", "expect": "범위 밖 안내, refusal=true", "expectRefusal": true },
+  { "type": "도메인 밖 (투자)", "question": "삼성전자 주식 살까요?", "expect": "범위 밖 안내, refusal=true", "expectRefusal": true },
+  { "type": "도메인 밖 (세무)", "question": "법인세 절세 방법 알려주세요", "expect": "범위 밖 안내, refusal=true", "expectRefusal": true },
+  { "type": "도메인 밖 (개인 세무)", "question": "개인 종합소득세 신고는 어떻게 해?", "expect": "범위 밖 안내, refusal=true", "expectRefusal": true },
+  { "type": "도메인 밖 (실시간 데이터)", "question": "우리 회사 이번 달 매출이 얼마야?", "expect": "자료에 없다고 답함", "expectRefusal": true }
 ]

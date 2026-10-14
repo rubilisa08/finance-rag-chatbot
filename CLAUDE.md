@@ -63,5 +63,7 @@ npm run search -- "계약부채가 뭐야?" "내일 날씨 어때?"            #
 
 ## 결정 필요
 - [ ] GitHub Pages 켜기 (Settings → Pages → Source: GitHub Actions) — 레포 소유자가 직접
-- [ ] 고정 질문 세트(PRD 9장) 실험 실행 후 README 실험 표 채우기 — 검색 단계는 `npm run search`로 빠르게 먼저 관찰
+- [x] 고정 질문 세트(PRD 9장, 14개) 실험 — README "고정 질문 실험" (`experiments/fixed-v3.json`). 중간에 멈추면 `--resume`으로 이어서 실행
+- [ ] 다음 실험 후보 (한 번에 하나씩): 청크 본문 끝 "(문단 N)" 빼기 / 근거 부족 질문 대응 규칙 / 사례 판단 질문이 IFRS-004·005를 찾도록 연결 문장
+- [ ] (선택) 고정 질문을 `--judge`로 돌려 LLM 판정과 문구 판정 비교 (이 PC에서 2시간 이상)
 - [ ] (선택) 브라우저 모델 캐시 이름 `moducon-embed-v1`(`rag.ts`) — 바꾸면 기존 방문자가 모델을 다시 받으므로 그대로 둠
